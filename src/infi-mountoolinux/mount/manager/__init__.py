@@ -1,0 +1,3 @@
+class MountManager(object):
+    pass
+
