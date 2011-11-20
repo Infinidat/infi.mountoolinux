@@ -1,8 +1,6 @@
-from test.test_weakset import SomeClass
 
 class BaseMountException(Exception):
     pass
-
 
 class IncorrectInvocationOrPermissions(BaseMountException):
     pass
@@ -42,5 +40,5 @@ class MountExceptionFactory(object):
         """
         bases = []
         bases = map(lambda bit: ERRORCODES_DICT[bit],
-                    filter(lambda bit: bit & errocode, ERRORCODES_DICT.keys()))
+                    filter(lambda bit: bit & error_code, ERRORCODES_DICT.keys()))
         return type("MountException", tuple(bases), {})(*args, **kwargs)
