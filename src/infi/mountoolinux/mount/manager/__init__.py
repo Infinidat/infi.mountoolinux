@@ -2,8 +2,11 @@ class MountManager(object):
     def get_supported_file_systems(self):
         """:returns: a list of mountable filesystems on this host
         :rtype: a list of strings"""
-        return self._get_list_of_internally_supported_file_systems() + \
-            self._get_list_of_supported_file_systems_by_helpers()
+        result = set()
+        for name in self._get_list_of_internally_supported_file_systems() + \
+                    self._get_list_of_supported_file_systems_by_helpers():
+            result.add(name)
+        return [name for name in result]
 
     def _get_list_of_internally_supported_file_systems(self):
         # mount will try to read the file /etc/filesystems,  or,
