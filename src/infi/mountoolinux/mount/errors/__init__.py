@@ -38,7 +38,6 @@ class MountExceptionFactory(object):
         """mount's return codes are bitwise ORed on some contants.
         This factory method creates a multiple-inherited exception class based on the error code
         """
-        bases = []
         bases = map(lambda bit: ERRORCODES_DICT[bit],
                     filter(lambda bit: bit & error_code, ERRORCODES_DICT.keys()))
         return type("MountException", tuple(bases), {})(*args, **kwargs)
