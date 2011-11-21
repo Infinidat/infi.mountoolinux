@@ -9,7 +9,7 @@ class MountEntry(object):
     def from_groupdict(cls, groupdict):
         return cls(**groupdict)
 
-    def __init__(self, fsname, dirname, typename, opts, freq, passno):
+    def __init__(self, fsname, dirname, typename, opts=dict(), freq=0, passno=0):
         self._bunch = Bunch(fsname=fsname, dirname=dirname,
                           typename=typename, opts=opts,
                           freq=freq, passno=passno)
@@ -91,14 +91,14 @@ class MountRepositoryMixin(object):
     def get_mounts_from_fstab(self):
         return [MountEntry.from_groupdict(groupdict) for groupdict in self._get_list_of_groupdicts_from_fstab()]
 
-    def is_mounted(self, entry):
-        for item in self._get_list_of_groupdicts_from_mtab():
-            if item.get_fsname() == entry.get_fsname() and item.get_dirname() == entry.get_dirname():
-                return True
-        return False
+    def is_path_mounted(self, dirname):
+        return any(item.get_dirname() == dirname for item in self.get_mounts_from_mtab())
 
-    def is_written_in_fstab(self, entry):
-        for item in self._get_list_of_groupdicts_from_fstab():
+    def is_fs_mounted(self, fsname):
+        return any(item.get_fsname() == fsname for item in self.get_mounts_from_mtab())
+
+    def is_entry_in_fstab(self, entry):
+        for item in self.get_mounts_from_fstab():
             if item.get_fsname() == entry.get_fsname() and item.get_dirname() == entry.get_dirname():
                 return True
         return False

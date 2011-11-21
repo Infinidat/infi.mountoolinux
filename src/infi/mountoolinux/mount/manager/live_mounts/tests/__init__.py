@@ -500,8 +500,37 @@ class ReadMountFilesTestCase(unittest.TestCase):
                 self.assertEqual(actual, FSTAB_REDHAT)
 
     @unittest.parameters.iterate("distro", ["ubuntu", "redhat"])
-    def test_get_mounts_from_fstan(self, distro):
+    def test_get_mounts_from_fstab(self, distro):
         with self.patch_getters(distro):
             actual = MountRepositoryMixin().get_mounts_from_fstab()
+            self.assertEqual(len(actual),
+                             len(MountRepositoryMixin()._get_list_of_groupdicts_from_fstab()))
             for instance in actual:
                 self.assertIsInstance(instance, MountEntry)
+
+    @unittest.parameters.iterate("distro", ["ubuntu", "redhat"])
+    def test_get_mounts_from_mtab(self, distro):
+        with self.patch_getters(distro):
+            actual = MountRepositoryMixin().get_mounts_from_mtab()
+            self.assertEqual(len(actual),
+                             len(MountRepositoryMixin()._get_list_of_groupdicts_from_mtab()))
+            for instance in actual:
+                self.assertIsInstance(instance, MountEntry)
+
+    def test_is_path_mounted(self):
+        with self.patch_getters("redhat"):
+            repo = MountRepositoryMixin()
+            self.assertTrue(repo.is_path_mounted("/"))
+            self.assertFalse(repo.is_path_mounted("hello world"))
+
+    def test_is_device_mounted(self):
+        with self.patch_getters("redhat"):
+            repo = MountRepositoryMixin()
+            self.assertTrue(repo.is_fs_mounted("/dev/sda1"))
+            self.assertFalse(repo.is_fs_mounted("hello world"))
+
+    def test_is_entry_in_fstab(self):
+        with self.patch_getters("redhat"):
+            repo = MountRepositoryMixin()
+            entry = repo.get_mounts_from_mtab()[4]
+            self.assertTrue(repo.is_entry_in_fstab(entry))
