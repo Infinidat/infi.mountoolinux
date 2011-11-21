@@ -7,3 +7,4 @@ tmpfs /dev/shm tmpfs rw,relatime 0 0
 /dev/sda1 / ext3 rw,relatime,errors=continue,user_xattr,acl,barrier=1,data=ordered 0 0
 /proc/bus/usb /proc/bus/usb usbfs rw,relatime 0 0
 none /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
+# none /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
