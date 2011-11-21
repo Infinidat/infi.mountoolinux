@@ -32,11 +32,11 @@ class MounterMixin(object):
             if value is True:
                 options += "{},".format(key)
             else:
-                options += "{}{},".format(key, value)
+                options += "{}={},".format(key, value)
         return ["-o", options.strip(',')]
 
     def mount_entry(self, entry):
-        args = ["-t", entry.get_typename(), entry.get_fsname(), entry.get_fsname()]
+        args = ["-t", entry.get_typename(), entry.get_fsname(), entry.get_dirname()]
         args.extend(self._format_options(entry))
         execute_mount(args)
 
