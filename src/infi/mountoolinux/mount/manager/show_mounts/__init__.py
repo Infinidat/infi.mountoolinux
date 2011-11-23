@@ -38,6 +38,22 @@ class MountEntry(object):
         """:returns: pass number on parallel fsck"""
         return self._bunch.passno
 
+    def _str_options(self):
+        if self.get_opts().keys() == []:
+            return ''
+        options = ''
+        for key, value in self.get_opts().items():
+            if value is True:
+                options += "{},".format(key)
+            else:
+                options += "{}={},".format(key, value)
+        return options.strip(',')
+
+    def __str__(self):
+        return "\t".join(str(item) for item in \
+                         [self.get_fsname(), self.get_dirname(), self.get_typename(),
+                         self._str_options(), self.get_freq(), self.get_passno()])
+
 class MountRepositoryMixin(object):
     def _read_file(self, path):
         from os.path import exists
@@ -59,16 +75,19 @@ class MountRepositoryMixin(object):
             return int(value)
         return value
 
-    def _parse_options_in_entries(self, entries):
+    def _parse_options_for_entry(self, entry):
+        string = entry["opts"]
+        results = {}
         pattern = compile(OPTION_PATTERN)
+        for match in pattern.finditer(string):
+            key = match.groupdict().get("key")
+            value = match.groupdict().get("value")
+            results[key] = self._translate_value(value)
+        entry["opts"] = results
+
+    def _parse_options_in_entries(self, entries):
         for entry in entries:
-            string = entry["opts"]
-            results = {}
-            for match in pattern.finditer(string):
-                key = match.groupdict().get("key")
-                value = match.groupdict().get("value")
-                results[key] = self._translate_value(value)
-            entry["opts"] = results
+            self._parse_options_for_entry(entry)
         return entries
 
     def _get_list_of_groupdicts_from_mtab(self):

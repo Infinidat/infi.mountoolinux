@@ -23,6 +23,8 @@ def execute_mount(args):
 def execute_umount(args):
     execute("umount", args)
 
+from infi.pyutils.contexts import contextmanager
+
 class MounterMixin(object):
     def _format_options(self, entry):
         if entry.get_opts().keys() == []:
@@ -44,8 +46,24 @@ class MounterMixin(object):
         args = [entry.get_dirname(), ]
         execute_umount(args)
 
+    @contextmanager
+    def _get_fstab_context(self, mode='a'):
+        with open("/etc/fstab", mode) as fd:
+            yield fd
+
+    def _read_fstab(self):
+        with open("/etc/fstab", 'r') as fd:
+            return fd.read()
+
     def add_entry_to_fstab(self, entry):
-        raise NotImplementedError()
+        with self._get_fstab_context() as fd:
+            fd.write("{}\n".format(entry))
 
     def remove_entry_from_fstab(self, entry):
-        raise NotImplementedError()
+        content = self._read_fstab()
+        line_to_remove = str(entry).strip()
+        with self._get_fstab_context('w') as fd:
+            for line in [line.strip() for line in content.splitlines()]:
+                if line_to_remove == line:
+                    continue
+                fd.write("{}\n").format(line)
