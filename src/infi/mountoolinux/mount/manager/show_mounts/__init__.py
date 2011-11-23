@@ -123,7 +123,7 @@ class MountRepositoryMixin(object):
         return False
 
 FSNAME_PATTERN = r"(?P<fsname>[a-zA-Z0-9=/_\-@:\.]+)"
-DIRNAME_PATTERN = r"(?P<dirname>[a-zA-Z0-9=/_\-]+)"
+DIRNAME_PATTERN = r"(?P<dirname>[a-zA-Z0-9=/_\-\.]+)"
 TYPNAME_PATTERN = r"(?P<typename>[a-zA-Z0-9_\.]+)"
 STRING_PATTERN = r"[a-zA-Z0-9_\-]+"
 OPTION_PATTERN = r"(?P<key>{})(?:=(?P<value>{}))?".format(STRING_PATTERN, STRING_PATTERN)

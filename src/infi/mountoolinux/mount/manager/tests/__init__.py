@@ -2,6 +2,7 @@ from unittest import SkipTest
 from infi import unittest
 from infi.pyutils.contexts import contextmanager
 from infi.execute import execute
+
 class MountManagerTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
