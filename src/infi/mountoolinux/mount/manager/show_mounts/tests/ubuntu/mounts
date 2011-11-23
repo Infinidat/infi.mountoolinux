@@ -1,0 +1,17 @@
+rootfs / rootfs rw 0 0
+none /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+none /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+none /dev devtmpfs rw,relatime,size=244132k,nr_inodes=61033,mode=755 0 0
+none /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+fusectl /sys/fs/fuse/connections fusectl rw,relatime 0 0
+/dev/mapper/guyr--ubuntu-root / ext4 rw,relatime,errors=remount-ro,barrier=1,data=ordered 0 0
+none /sys/kernel/debug debugfs rw,relatime 0 0
+none /sys/kernel/security securityfs rw,relatime 0 0
+none /dev/shm tmpfs rw,nosuid,nodev,relatime 0 0
+none /var/run tmpfs rw,nosuid,relatime,mode=755 0 0
+none /var/lock tmpfs rw,nosuid,nodev,noexec,relatime 0 0
+/dev/sda1 /boot ext2 rw,relatime,errors=continue 0 0
+root@bootsrv:/ /media/bootsrv fuse.sshfs rw,nosuid,nodev,relatime,user_id=1000,group_id=1000,max_read=65536 0 0
+guy@192.168.11.62:/ /media/guyr-air fuse.sshfs rw,nosuid,nodev,relatime,user_id=1000,group_id=1000,max_read=65536 0 0
+/dev/loop0 /tmp/bar ext3 rw,relatime,errors=continue,barrier=0,data=ordered 0 0
+# /dev/loop0 /tmp/bar ext3 rw,relatime,errors=continue,barrier=0,data=ordered 0 0

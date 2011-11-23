@@ -1,0 +1,15 @@
+/dev/mapper/guyr--ubuntu-root / ext4 rw,errors=remount-ro 0 0
+proc /proc proc rw,noexec,nosuid,nodev 0 0
+none /sys sysfs rw,noexec,nosuid,nodev 0 0
+fusectl /sys/fs/fuse/connections fusectl rw 0 0
+none /sys/kernel/debug debugfs rw 0 0
+none /sys/kernel/security securityfs rw 0 0
+none /dev devtmpfs rw,mode=0755 0 0
+none /dev/pts devpts rw,noexec,nosuid,gid=5,mode=0620 0 0
+none /dev/shm tmpfs rw,nosuid,nodev 0 0
+none /var/run tmpfs rw,nosuid,mode=0755 0 0
+none /var/lock tmpfs rw,noexec,nosuid,nodev 0 0
+/dev/sda1 /boot ext2 rw 0 0
+root@bootsrv:/ /media/bootsrv fuse.sshfs rw,nosuid,nodev,max_read=65536,user=guyr 0 0
+guy@192.168.11.62:/ /media/guyr-air fuse.sshfs rw,nosuid,nodev,max_read=65536,user=guyr 0 0
+/dev/loop0 /tmp/bar ext3 rw 0 0

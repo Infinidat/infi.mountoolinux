@@ -1,0 +1,10 @@
+rootfs / rootfs rw 0 0
+/proc /proc proc rw,relatime 0 0
+/sys /sys sysfs rw,relatime 0 0
+udev /dev devtmpfs rw,relatime,size=501668k,nr_inodes=125417,mode=755 0 0
+devpts /dev/pts devpts rw,relatime,gid=5,mode=620,ptmxmode=000 0 0
+tmpfs /dev/shm tmpfs rw,relatime 0 0
+/dev/sda1 / ext3 rw,relatime,errors=continue,user_xattr,acl,barrier=1,data=ordered 0 0
+/proc/bus/usb /proc/bus/usb usbfs rw,relatime 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
+# none /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
