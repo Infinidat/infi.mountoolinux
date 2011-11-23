@@ -9,10 +9,12 @@ class GetSupportedTestCase(unittest.TestCase):
     @contextmanager
     def patch_getters(self):
         with nested(patch.object(SupportedFileSystemsMixin, "_get_proc_filesystems"),
-                    patch.object(SupportedFileSystemsMixin, "_get_etc_filesystems")) as \
-                    (proc, etc):
+                    patch.object(SupportedFileSystemsMixin, "_get_etc_filesystems"),
+                    patch("glob.glob")) as \
+                    (proc, etc, glob):
             etc.return_value = ''
             proc.return_value = ''
+            glob.return_value = []
             yield (proc, etc)
 
     def test_empty_list(self):
@@ -66,18 +68,18 @@ class GetSupportedTestCase(unittest.TestCase):
 
     def test_helpers_only(self):
         import glob
-        with patch.object(glob, "glob") as _glob:
-            _glob.return_value = ["/sbin/mount.{}".format(name) for name in ['ntfs', 'nfs', 'cifs']]
-            with self.patch_getters():
+        with self.patch_getters():
+            with patch.object(glob, "glob") as _glob:
+                _glob.return_value = ["/sbin/mount.{}".format(name) for name in ['ntfs', 'nfs', 'cifs']]
                 actual = SupportedFileSystemsMixin().get_supported_file_systems()
                 expected = ['ntfs', 'nfs', 'cifs']
                 self.assertEqual(actual, expected)
 
     def test_internal_and_helpers__different_data(self):
         import glob
-        with patch.object(glob, "glob") as _glob:
-            _glob.return_value = ["/sbin/mount.{}".format(name) for name in ['ntfs', 'nfs', 'cifs']]
-            with self.patch_getters() as (proc, etc):
+        with self.patch_getters() as (proc, etc):
+            with patch.object(glob, "glob") as _glob:
+                _glob.return_value = ["/sbin/mount.{}".format(name) for name in ['ntfs', 'nfs', 'cifs']]
                 proc.return_value = "xxx"
                 with open(join(dirname(__file__), "etc")) as fd:
                     etc.return_value = fd.read() + "\n*"
