@@ -13,9 +13,10 @@ class MountManagerTestCase(unittest.TestCase):
     def tempfile_context(self, filesystem="ext3"):
         from tempfile import mkstemp
         fd, name = mkstemp()
+        from os import write, close
         ZERO_MB = '\x00' * 1024 * 1024
-        fd.write(ZERO_MB * 10)
-        fd.close()
+        write(fd, ZERO_MB * 10)
+        close(fd)
         execute("mkfs.ext3 -F {}".format(name).split())
         yield name
 
