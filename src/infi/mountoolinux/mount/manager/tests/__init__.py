@@ -23,7 +23,9 @@ class MountManagerTestCase(unittest.TestCase):
     def test__tempfile_loop_device(self):
         filesystem = "ext3"
         with self.tempfile_context(filesystem) as block_path:
+            from os import makedirs
             mount_path = "{}.mount".format(block_path)
+            makedirs(mount_path)
             from .. import MountManager, MountEntry
             manager = MountManager()
             self.assertFalse(manager.is_path_mounted(mount_path))
