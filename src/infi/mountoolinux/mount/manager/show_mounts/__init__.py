@@ -1,5 +1,5 @@
 from bunch import Bunch
-from re import compile, MULTILINE
+import re
 
 from logging import getLogger
 log = getLogger()
@@ -78,7 +78,7 @@ class MountRepositoryMixin(object):
     def _parse_options_for_entry(self, entry):
         string = entry["opts"]
         results = {}
-        pattern = compile(OPTION_PATTERN)
+        pattern = recompile(OPTION_PATTERN)
         for match in pattern.finditer(string):
             key = match.groupdict().get("key")
             value = match.groupdict().get("value")
@@ -91,7 +91,7 @@ class MountRepositoryMixin(object):
         return entries
 
     def _get_list_of_groupdicts_from_mtab(self):
-        pattern = compile(MOUNT_ENTRY_PATTERN, MULTILINE)
+        pattern = re.compile(MOUNT_ENTRY_PATTERN, re.MULTILINE)
         string = self._read_mtab_from_proc()
         log.debug("mtab content = \n{}".format(string))
         results = [match.groupdict() for match in pattern.finditer(string)]
@@ -101,7 +101,7 @@ class MountRepositoryMixin(object):
         return [MountEntry.from_groupdict(groupdict) for groupdict in self._get_list_of_groupdicts_from_mtab()]
 
     def _get_list_of_groupdicts_from_fstab(self):
-        pattern = compile(MOUNT_ENTRY_PATTERN, MULTILINE)
+        pattern = re.compile(MOUNT_ENTRY_PATTERN, re.MULTILINE)
         string = self._read_fstab()
         log.debug("fstab content = \n{}".format(string))
         results = [match.groupdict() for match in pattern.finditer(string)]
@@ -131,10 +131,10 @@ OPTS_PATTERN = r"(?P<opts>[a-zA-Z0-9_\-=,\.]+)"
 FREQ_PATTERN = r"(?P<freq>\d*)"
 PASSNO_PATTERN = r"(?P<passno>\d*)"
 
-DELIMITER = r"[ \t]+"
+SEP = r"[ \t]+"
 
-ENTRY_PATTERN = r"^{fsname}{delimiter}{dirname}{delimiter}{typename}{delimiter}{opts}{delimiter}{freq}{delimiter}{passno}$"
-MOUNT_ENTRY_PATTERN = ENTRY_PATTERN.format(delimiter=DELIMITER,
+ENTRY_PATTERN = r"^{fsname}{sep}{dirname}{sep}{typename}{sep}{opts}{sep}{freq}{sep}{passno}$"
+MOUNT_ENTRY_PATTERN = ENTRY_PATTERN.format(sep=SEP,
                                            fsname=FSNAME_PATTERN,
                                            dirname=DIRNAME_PATTERN,
                                            typename=TYPNAME_PATTERN,
