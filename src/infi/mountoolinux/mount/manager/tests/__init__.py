@@ -3,6 +3,8 @@ from infi import unittest
 from infi.pyutils.contexts import contextmanager
 from infi.execute import execute
 
+#pylint: disable-msg=C0103
+
 class MountManagerTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

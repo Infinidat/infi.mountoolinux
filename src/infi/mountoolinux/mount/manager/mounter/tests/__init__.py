@@ -3,11 +3,6 @@ from contextlib import nested, contextmanager
 from .. import MounterMixin
 from ...show_mounts import MountEntry
 from mock import patch
-from os.path import dirname, join
-import glob
-
-from logging import getLogger
-log = getLogger()
 
 class MounterTestCase(unittest.TestCase):
     @contextmanager

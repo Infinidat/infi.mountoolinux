@@ -8,6 +8,8 @@ import glob
 from logging import getLogger
 log = getLogger()
 
+#pylint: disable-msg=W0212
+
 MTAB_REDHAT = [
     {
         "freq": "0",

@@ -5,6 +5,8 @@ from mock import patch
 from os.path import dirname, join
 import glob
 
+#pylint: disable-msg=W0621
+
 class GetSupportedTestCase(unittest.TestCase):
     @contextmanager
     def patch_getters(self):
