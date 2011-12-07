@@ -78,7 +78,7 @@ class MountRepositoryMixin(object):
     def _parse_options_for_entry(self, entry):
         string = entry["opts"]
         results = {}
-        pattern = recompile(OPTION_PATTERN)
+        pattern = re.compile(OPTION_PATTERN)
         for match in pattern.finditer(string):
             key = match.groupdict().get("key")
             value = match.groupdict().get("value")
