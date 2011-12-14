@@ -122,12 +122,13 @@ class MountRepositoryMixin(object):
                 return True
         return False
 
-FSNAME_PATTERN = r"(?P<fsname>[a-zA-Z0-9=/_\-@:\.]+)"
-DIRNAME_PATTERN = r"(?P<dirname>[a-zA-Z0-9=/_\-\.]+)"
-TYPNAME_PATTERN = r"(?P<typename>[a-zA-Z0-9_\.]+)"
-STRING_PATTERN = r"[a-zA-Z0-9_\-]+"
+WORD_PATTERN = r"[^# \t\n\r\f\v]+"
+FSNAME_PATTERN = r"(?P<fsname>{})".format(WORD_PATTERN)
+DIRNAME_PATTERN = r"(?P<dirname>{})".format(WORD_PATTERN)
+TYPNAME_PATTERN = r"(?P<typename>{})".format(WORD_PATTERN)
+STRING_PATTERN = r"[^,=# \t\n\r\f\v]+"
 OPTION_PATTERN = r"(?P<key>{})(?:=(?P<value>{}))?".format(STRING_PATTERN, STRING_PATTERN)
-OPTS_PATTERN = r"(?P<opts>[a-zA-Z0-9_\-=,\.]+)"
+OPTS_PATTERN = r"(?P<opts>{})".format(WORD_PATTERN)
 FREQ_PATTERN = r"(?P<freq>\d*)"
 PASSNO_PATTERN = r"(?P<passno>\d*)"
 
