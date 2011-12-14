@@ -14,8 +14,8 @@ class ExceptionFactoryTestCase(unittest.TestCase):
         self.assertIsInstance(error, ERRORCODES_DICT[2])
 
     def test_all(self):
-        sum = 1 + 2 + 4 + 8 + 16 + 32 + 64
-        error = MountExceptionFactory.create(sum)
+        error_mask = 1 + 2 + 4 + 8 + 16 + 32 + 64
+        error = MountExceptionFactory.create(error_mask)
         for key, value in ERRORCODES_DICT.items():
             self.assertIsInstance(error, value)
 

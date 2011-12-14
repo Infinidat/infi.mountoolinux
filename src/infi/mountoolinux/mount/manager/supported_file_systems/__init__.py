@@ -61,6 +61,3 @@ class SupportedFileSystemsMixin(object):
         return map(lambda path: path.replace(replace_string, ""),
                    glob("{}*".format(replace_string)))
 
-        raise NotImplementedError()
-
-
