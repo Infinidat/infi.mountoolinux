@@ -77,7 +77,12 @@ class MaintainingFSTabTestCase(unittest.TestCase):
             entry = MountEntry("foo" , "bar", "baz", {"rw":True, "relatime":True,
                                                       "size":"501668k",
                                                       "mode":755})
+            second_entry = MountEntry("foo1" , "bar1", "baz1", {"rw":True, "relatime":True,
+                                                      "size":"501668k",
+                                                      "mode":755})
             MounterMixin().add_entry_to_fstab(entry)
+            MounterMixin().add_entry_to_fstab(second_entry)
             self.assertTrue(MountRepositoryMixin().is_entry_in_fstab(entry))
             MounterMixin().remove_entry_from_fstab(entry)
             self.assertFalse(MountRepositoryMixin().is_entry_in_fstab(entry))
+            self.assertTrue(MountRepositoryMixin().is_entry_in_fstab(second_entry))

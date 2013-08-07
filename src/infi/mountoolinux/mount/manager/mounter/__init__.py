@@ -66,4 +66,4 @@ class MounterMixin(object):
             for line in [line.strip() for line in content.splitlines()]:
                 if line_to_remove == line:
                     continue
-                fd.write("{}\n").format(line)
+                fd.write("{}\n".format(line))
