@@ -20,7 +20,7 @@ class MountEntry(object):
 
     def get_dirname(self):
         """:returns: file system path prefix"""
-        return self._bunch.dirname
+        return self._bunch.dirname.replace(r"\040", " ")  # HIP-688 spaces appear different in mtab
 
     def get_typename(self):
         """:returns: mount type"""
