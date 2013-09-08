@@ -7,12 +7,12 @@ class SupportedFileSystemsMixin(object):
                     self._get_list_of_supported_file_systems_by_helpers():
             result.add(name)
         return [name for name in result]
-        
+
     def get_creatable_file_systems(self):
         from os import listdir
         mountable = self.get_supported_file_systems()
         creatable = [fs[5:] for fs in listdir("/sbin") if fs.startswith("mkfs.")]
-        creatable_and_mountable = [fs for fs in creatable if fs in mountable]
+        creatable_and_mountable = [fs for fs in mountable if fs in creatable]
         return creatable_and_mountable
 
     def _get_list_of_internally_supported_file_systems(self):
