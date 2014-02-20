@@ -1,4 +1,4 @@
-from bunch import Bunch
+from munch import Munch
 import re
 
 from logging import getLogger
@@ -10,7 +10,7 @@ class MountEntry(object):
         return cls(**groupdict)
 
     def __init__(self, fsname, dirname, typename, opts=dict(), freq=0, passno=0):
-        self._bunch = Bunch(fsname=fsname, dirname=dirname,
+        self._bunch = Munch(fsname=fsname, dirname=dirname,
                           typename=typename, opts=opts,
                           freq=freq, passno=passno)
 
