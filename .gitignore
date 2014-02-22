@@ -41,3 +41,4 @@ bootstrap.py
 src/infi/mountoolinux/__version__.py
 src/infi/mountoolinux/__version__.py
 .cache
+eggs
