@@ -15,6 +15,16 @@ class SupportedFileSystemsMixin(object):
         creatable_and_mountable = [fs for fs in mountable if fs in creatable]
         return creatable_and_mountable
 
+    def _is_ext4_supported(self):
+        # HIP-1035
+        # some RedHat-based distributions are 'techonology preview', and don't
+        # have exte4 listed in /etc/filesystems although it exists inside
+        # some other versions of RedHat have a bug that ext4 is not listed
+        # in /etc/filesystems
+        # so this is a workground for these old versions of RedHat and variants
+        from os import path
+        return path.exists(path.join(path.sep, '/sbin/mkfs.ext4'))
+
     def _get_list_of_internally_supported_file_systems(self):
         # mount will try to read the file /etc/filesystems,  or,
         # if  that  does  not  exist, /proc/filesystems.  All of the filesystem types listed there will be
@@ -27,6 +37,8 @@ class SupportedFileSystemsMixin(object):
                                 self._get_etc_filesystems().splitlines()[-1] == '*'):
             for name in self._get_filesystem_names_from_proc():
                 result.add(name)
+        if self._is_ext4_supported():
+            result.add('ext4')
         return [name for name in result]
 
     def _get_filesystem_names_from_etc(self):
