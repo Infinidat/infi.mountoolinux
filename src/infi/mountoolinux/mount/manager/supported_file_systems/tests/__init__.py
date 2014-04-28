@@ -12,11 +12,13 @@ class GetSupportedTestCase(unittest.TestCase):
     def patch_getters(self):
         with nested(patch.object(SupportedFileSystemsMixin, "_get_proc_filesystems"),
                     patch.object(SupportedFileSystemsMixin, "_get_etc_filesystems"),
+                    patch.object(SupportedFileSystemsMixin, "_is_ext4_supported"),
                     patch("glob.glob")) as \
-                    (proc, etc, glob):
+                    (proc, etc, _is_ext4_supported, glob):
             etc.return_value = ''
             proc.return_value = ''
             glob.return_value = []
+            _is_ext4_supported.return_value = False
             yield (proc, etc)
 
     def test_empty_list(self):
