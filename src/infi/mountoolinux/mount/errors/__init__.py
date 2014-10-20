@@ -1,6 +1,6 @@
-from infi.exceptools import InfinException
+from infi.exceptools import InfiException
 
-class MountException(InfinException):
+class MountException(InfiException):
     pass
 
 class IncorrectInvocationOrPermissions(BaseMountException):
