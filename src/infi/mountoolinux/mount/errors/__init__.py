@@ -3,25 +3,25 @@ from infi.exceptools import InfiException
 class MountException(InfiException):
     pass
 
-class IncorrectInvocationOrPermissions(BaseMountException):
+class IncorrectInvocationOrPermissions(MountException):
     pass
 
-class SystemErrorExeption(BaseMountException):
+class SystemErrorExeption(MountException):
     pass
 
-class MountInternalBugException(BaseMountException):
+class MountInternalBugException(MountException):
     pass
 
-class UserInterruptException(BaseMountException):
+class UserInterruptException(MountException):
     pass
 
-class ProblemWithWritingOrLockingException(BaseMountException):
+class ProblemWithWritingOrLockingException(MountException):
     pass
 
-class MountFailureException(BaseMountException):
+class MountFailureException(MountException):
     pass
 
-class SomeMountSucceededException(BaseMountException):
+class SomeMountSucceededException(MountException):
     pass
 
 
