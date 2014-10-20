@@ -1,6 +1,6 @@
 
-from ...errors import MountExceptionFactory
-
+from infi.mountoolinux.mount.errors import MountException
+from infi.exceptools import chain
 def execute(commandname, args):
     from logging import getLogger
     log = getLogger()
@@ -15,7 +15,7 @@ def execute(commandname, args):
     debug('stdout = %s', subprocess.get_stdout())
     debug('stderr = %s', subprocess.get_stderr())
     if subprocess.get_returncode() != 0:
-        raise MountExceptionFactory.create(subprocess.get_returncode())
+        raise chain(MountException(subprocess.get_returncode()))
 
 def execute_mount(args):
     execute("mount", args)

@@ -1,5 +1,6 @@
+from infi.exceptools import InfinException
 
-class BaseMountException(Exception):
+class MountException(InfinException):
     pass
 
 class IncorrectInvocationOrPermissions(BaseMountException):
@@ -31,13 +32,3 @@ ERRORCODES_DICT = {1:IncorrectInvocationOrPermissions,
                    16:ProblemWithWritingOrLockingException,
                    32:MountFailureException,
                    64:SomeMountSucceededException}
-
-class MountExceptionFactory(object):
-    @classmethod
-    def create(cls, error_code, *args, **kwargs):
-        """mount's return codes are bitwise ORed on some contants.
-        This factory method creates a multiple-inherited exception class based on the error code
-        """
-        bases = map(lambda bit: ERRORCODES_DICT[bit],
-                    filter(lambda bit: bit & error_code, ERRORCODES_DICT.keys()))
-        return type("MountException", tuple(bases), {})(*args, **kwargs)
