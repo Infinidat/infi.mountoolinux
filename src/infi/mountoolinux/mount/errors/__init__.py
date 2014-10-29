@@ -1,26 +1,27 @@
+from infi.exceptools import InfiException
 
-class BaseMountException(Exception):
+class MountException(InfiException):
     pass
 
-class IncorrectInvocationOrPermissions(BaseMountException):
+class IncorrectInvocationOrPermissions(MountException):
     pass
 
-class SystemErrorExeption(BaseMountException):
+class SystemErrorExeption(MountException):
     pass
 
-class MountInternalBugException(BaseMountException):
+class MountInternalBugException(MountException):
     pass
 
-class UserInterruptException(BaseMountException):
+class UserInterruptException(MountException):
     pass
 
-class ProblemWithWritingOrLockingException(BaseMountException):
+class ProblemWithWritingOrLockingException(MountException):
     pass
 
-class MountFailureException(BaseMountException):
+class MountFailureException(MountException):
     pass
 
-class SomeMountSucceededException(BaseMountException):
+class SomeMountSucceededException(MountException):
     pass
 
 
@@ -31,13 +32,3 @@ ERRORCODES_DICT = {1:IncorrectInvocationOrPermissions,
                    16:ProblemWithWritingOrLockingException,
                    32:MountFailureException,
                    64:SomeMountSucceededException}
-
-class MountExceptionFactory(object):
-    @classmethod
-    def create(cls, error_code, *args, **kwargs):
-        """mount's return codes are bitwise ORed on some contants.
-        This factory method creates a multiple-inherited exception class based on the error code
-        """
-        bases = map(lambda bit: ERRORCODES_DICT[bit],
-                    filter(lambda bit: bit & error_code, ERRORCODES_DICT.keys()))
-        return type("MountException", tuple(bases), {})(*args, **kwargs)
