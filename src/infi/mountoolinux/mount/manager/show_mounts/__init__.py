@@ -1,15 +1,21 @@
-from munch import Munch
+import platform
 import re
+from munch import Munch
 
 from logging import getLogger
 log = getLogger()
+
+if platform.system().lower() == 'sunos':
+    DEFAULT_PASSNO = '-'
+else:
+    DEFAULT_PASSNO = 0
 
 class MountEntry(object):
     @classmethod
     def from_groupdict(cls, groupdict):
         return cls(**groupdict)
 
-    def __init__(self, fsname, dirname, typename, opts=dict(), freq=0, passno=0, mountonboot="yes", createtime=0):
+    def __init__(self, fsname, dirname, typename, opts=dict(), freq=0, passno=DEFAULT_PASSNO, mountonboot="yes", createtime=0):
         self._bunch = Munch(fsname=fsname, dirname=dirname,
                           typename=typename, opts=opts,
                           freq=freq, passno=passno, mountonboot=mountonboot, createtime=createtime)
@@ -63,9 +69,11 @@ class MountEntry(object):
                          self._str_options(), self.get_freq(), self.get_passno()])
 
     def get_format_solaris(self):
-        return "\t".join(str(item) for item in \
-                         [self.get_fsname(), '-', self.get_dirname().replace("none", '-'), self.get_typename(),
-                         self.get_passno(), self.get_mountonboot(), self._str_options()])
+        string_double_sep = "\t\t".join(str(item) for item in \
+                        [self.get_fsname(), '-', self.get_dirname().replace("none", '-'), self.get_typename()])
+        string_one_sep = "\t".join(str(item) for item in \
+                        [self.get_passno(), self.get_mountonboot(), self._str_options().replace('', '-')])
+        return "\t".join([string_double_sep, string_one_sep])
 
     def __str__(self):
         return self.get_format_linux()

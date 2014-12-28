@@ -41,11 +41,14 @@ class MounterMixin(object):
 
     @contextmanager
     def _get_fstab_context(self, mode='a'):
-        with open("/etc/fstab", mode) as fd:
+        from os.path import exists
+        if not exists(self.FSTAB_PATH):
+            raise IOError
+        with open(self.FSTAB_PATH, mode) as fd:
             yield fd
 
     def _read_fstab(self):
-        with open("/etc/fstab", 'r') as fd:
+        with open(self.FSTAB_PATH, 'r') as fd:
             return fd.read()
 
     def _get_entry_format(self, entry):
