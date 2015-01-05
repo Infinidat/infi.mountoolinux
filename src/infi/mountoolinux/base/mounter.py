@@ -1,5 +1,6 @@
-from infi.mountoolinux.mount.errors import MountException
+from ..exceptions import MountException
 from infi.exceptools import chain
+from infi.pyutils.contexts import contextmanager
 
 def execute(commandname, args):
     from logging import getLogger
@@ -23,8 +24,6 @@ def execute_mount(args):
 def execute_umount(args):
     execute("umount", args)
 
-from infi.pyutils.contexts import contextmanager
-
 class MounterMixin(object):
     FSTAB_PATH = "/etc/fstab"
 
@@ -43,7 +42,7 @@ class MounterMixin(object):
     def _get_fstab_context(self, mode='a'):
         from os.path import exists
         if not exists(self.FSTAB_PATH):
-            raise IOError
+            raise IOError()
         with open(self.FSTAB_PATH, mode) as fd:
             yield fd
 
@@ -52,10 +51,10 @@ class MounterMixin(object):
             return fd.read()
 
     def _get_entry_format(self, entry):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def mount_entry(self, entry):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def umount_entry(self, entry):
         args = [entry.get_dirname(), ]
@@ -73,23 +72,3 @@ class MounterMixin(object):
                 if line_to_remove == line:
                     continue
                 fd.write("{}\n".format(line))
-
-class LinuxMounterMixin(MounterMixin):
-    def _get_entry_format(self, entry):
-        return entry.get_format_linux()
-
-    def mount_entry(self, entry):
-        args = ["-t", entry.get_typename(), entry.get_fsname(), entry.get_dirname()]
-        args.extend(self._format_options(entry))
-        execute_mount(args)
-
-class SolarisMounterMixin(MounterMixin):
-    FSTAB_PATH = "/etc/vfstab"
-
-    def _get_entry_format(self, entry):
-        return entry.get_format_solaris()
-
-    def mount_entry(self, entry):
-        args = ["-F", entry.get_typename(), entry.get_fsname(), entry.get_dirname()]
-        args.extend(self._format_options(entry))
-        execute_mount(args)

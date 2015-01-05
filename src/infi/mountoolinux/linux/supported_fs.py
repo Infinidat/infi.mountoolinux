@@ -1,4 +1,6 @@
-class SupportedFileSystemsMixin(object):
+from ..base.supported_fs import SupportedFileSystemsMixin
+
+class LinuxSupportedFileSystemsMixin(SupportedFileSystemsMixin):
     def get_supported_file_systems(self):
         """:returns: a list of mountable filesystems on this host
         :rtype: a list of strings"""
