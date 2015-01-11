@@ -25,8 +25,6 @@ def execute_umount(args):
     execute("umount", args)
 
 class MounterMixin(object):
-    FSTAB_PATH = "/etc/fstab"
-
     def _format_options(self, entry):
         if entry.get_opts().keys() == []:
             return []
@@ -38,16 +36,19 @@ class MounterMixin(object):
                 options += "{}={},".format(key, value)
         return ["-o", options.strip(',')]
 
+    def _get_fstab_path(self):
+        return "/etc/fstab"
+
     @contextmanager
     def _get_fstab_context(self, mode='a'):
         from os.path import exists
-        if not exists(self.FSTAB_PATH):
+        if not exists(self._get_fstab_path()):
             raise IOError()
-        with open(self.FSTAB_PATH, mode) as fd:
+        with open(self._get_fstab_path(), mode) as fd:
             yield fd
 
     def _read_fstab(self):
-        with open(self.FSTAB_PATH, 'r') as fd:
+        with open(self._get_fstab_path(), 'r') as fd:
             return fd.read()
 
     def _get_entry_format(self, entry):

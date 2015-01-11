@@ -1,13 +1,16 @@
 import platform
 import re
 from munch import Munch
-from . import MountEntry
+from . import SolarisMountEntry
 from ...base.mount import MountRepositoryMixin
 
 from logging import getLogger
 log = getLogger()
 
 class SolarisMountRepositoryMixin(MountRepositoryMixin):
+    def _get_mount_entry_class(self):
+        return SolarisMountEntry
+
     def _read_fstab(self):
         return self._read_file("/etc/vfstab")
 

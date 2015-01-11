@@ -1,2 +1,2 @@
-from .entry import SolarisMountEntry as MountEntry
+from .entry import SolarisMountEntry
 from .repository import SolarisMountRepositoryMixin

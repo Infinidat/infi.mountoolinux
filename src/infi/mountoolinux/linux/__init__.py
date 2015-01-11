@@ -1,6 +1,5 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
-import platform
 from ..base import MountManagerBaseClass
 
 from .mount import LinuxMountRepositoryMixin

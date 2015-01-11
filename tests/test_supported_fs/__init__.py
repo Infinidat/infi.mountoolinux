@@ -1,18 +1,18 @@
 from infi import unittest
 from contextlib import nested, contextmanager
-from .. import SupportedFileSystemsMixin
+from infi.mountoolinux.linux import LinuxSupportedFileSystemsMixin
 from mock import patch
 from os.path import dirname, join
 import glob
 
 #pylint: disable-msg=W0621
 
-class GetSupportedTestCase(unittest.TestCase):
+class LinuxGetSupportedTestCase(unittest.TestCase):
     @contextmanager
     def patch_getters(self):
-        with nested(patch.object(SupportedFileSystemsMixin, "_get_proc_filesystems"),
-                    patch.object(SupportedFileSystemsMixin, "_get_etc_filesystems"),
-                    patch.object(SupportedFileSystemsMixin, "_is_ext4_supported"),
+        with nested(patch.object(LinuxSupportedFileSystemsMixin, "_get_proc_filesystems"),
+                    patch.object(LinuxSupportedFileSystemsMixin, "_get_etc_filesystems"),
+                    patch.object(LinuxSupportedFileSystemsMixin, "_is_ext4_supported"),
                     patch("glob.glob")) as \
                     (proc, etc, _is_ext4_supported, glob):
             etc.return_value = ''
@@ -23,7 +23,7 @@ class GetSupportedTestCase(unittest.TestCase):
 
     def test_empty_list(self):
         with self.patch_getters() as (proc, etc):
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = []
             self.assertEqual(actual, expected)
 
@@ -31,7 +31,7 @@ class GetSupportedTestCase(unittest.TestCase):
         with self.patch_getters() as (proc, etc):
             with open(join(dirname(__file__), "proc")) as fd:
                 proc.return_value = fd.read()
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = ["ext3", "iso9660"]
             self.assertEqual(actual, expected)
 
@@ -39,7 +39,7 @@ class GetSupportedTestCase(unittest.TestCase):
         with self.patch_getters() as (proc, etc):
             with open(join(dirname(__file__), "etc")) as fd:
                 etc.return_value = fd.read()
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = ['hfsplus', 'ext3', 'ext2', 'iso9660', 'hfs', 'vfat']
             self.assertEqual(actual, expected)
 
@@ -47,7 +47,7 @@ class GetSupportedTestCase(unittest.TestCase):
         with self.patch_getters() as (proc, etc):
             with open(join(dirname(__file__), "etc")) as fd:
                 etc.return_value = fd.read() + "\n*"
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = ['hfsplus', 'ext3', 'ext2', 'iso9660', 'hfs', 'vfat']
             self.assertEqual(actual, expected)
             self.assertTrue(proc.called)
@@ -57,7 +57,7 @@ class GetSupportedTestCase(unittest.TestCase):
             proc.return_value = "hfs\next3"
             with open(join(dirname(__file__), "etc")) as fd:
                 etc.return_value = fd.read() + "\n*"
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = ['hfsplus', 'ext3', 'ext2', 'iso9660', 'hfs', 'vfat']
             self.assertEqual(actual, expected)
 
@@ -66,7 +66,7 @@ class GetSupportedTestCase(unittest.TestCase):
             proc.return_value = "xxx"
             with open(join(dirname(__file__), "etc")) as fd:
                 etc.return_value = fd.read() + "\n*"
-            actual = SupportedFileSystemsMixin().get_supported_file_systems()
+            actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
             expected = ['hfsplus', 'ext3', 'ext2', 'iso9660', 'hfs', 'xxx', 'vfat']
             self.assertEqual(actual, expected)
 
@@ -75,7 +75,7 @@ class GetSupportedTestCase(unittest.TestCase):
         with self.patch_getters():
             with patch.object(glob, "glob") as _glob:
                 _glob.return_value = ["/sbin/mount.{}".format(name) for name in ['ntfs', 'nfs', 'cifs']]
-                actual = SupportedFileSystemsMixin().get_supported_file_systems()
+                actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
                 expected = ['ntfs', 'nfs', 'cifs']
                 self.assertEqual(actual, expected)
 
@@ -87,7 +87,7 @@ class GetSupportedTestCase(unittest.TestCase):
                 proc.return_value = "xxx"
                 with open(join(dirname(__file__), "etc")) as fd:
                     etc.return_value = fd.read() + "\n*"
-                actual = SupportedFileSystemsMixin().get_supported_file_systems()
+                actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
                 expected = ['hfsplus', 'ntfs', 'ext3', 'ext2', 'iso9660', 'hfs', 'xxx', 'nfs', 'vfat', 'cifs']
                 self.assertEqual(actual, expected)
 
@@ -99,6 +99,6 @@ class GetSupportedTestCase(unittest.TestCase):
                 proc.return_value = "hfs\next3"
                 with open(join(dirname(__file__), "etc")) as fd:
                     etc.return_value = fd.read() + "\n*"
-                actual = SupportedFileSystemsMixin().get_supported_file_systems()
+                actual = LinuxSupportedFileSystemsMixin().get_supported_file_systems()
                 expected = ['hfsplus', 'ext3', 'ext2', 'iso9660', 'hfs', 'vfat']
                 self.assertEqual(actual, expected)

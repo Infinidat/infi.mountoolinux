@@ -3,14 +3,12 @@ from infi import unittest
 from infi.pyutils.contexts import contextmanager
 from infi.execute import execute
 
-#pylint: disable-msg=C0103
-
 class MountManagerTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from platform import platform
-        if not platform().startswith("Linux"):
-            raise SkipTest("This TestCase runs only on Linux")
+        if not platform().lower() in ["solaris", "linux"]:
+            raise SkipTest("This TestCase runs only on Linux and Solaris")
 
     @contextmanager
     def tempfile_context(self, filesystem="ext3"):
@@ -29,10 +27,10 @@ class MountManagerTestCase(unittest.TestCase):
             from os import makedirs
             mount_path = "{}.mount".format(block_path)
             makedirs(mount_path)
-            from .. import MountManager, MountEntry
+            from infi.mountoolinux.linux import LinuxMountManager
             manager = MountManager()
             self.assertFalse(manager.is_path_mounted(mount_path))
-            entry = MountEntry(block_path, mount_path, filesystem, opts={"loop":True})
+            entry = manager._get_mount_entry_class()(block_path, mount_path, filesystem, opts={"loop":True})
             manager.mount_entry(entry)
             self.assertTrue(manager.is_path_mounted(mount_path))
             manager.umount_entry(entry)

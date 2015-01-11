@@ -1,11 +1,12 @@
 from infi import unittest
 from contextlib import nested, contextmanager
-from .. import MountEntry, LinuxMountRepositoryMixin, SolarisMountRepositoryMixin
 from mock import patch
 from os.path import dirname, join
 from expected import MTAB_REDHAT, MTAB_UBUNTU, MTAB_SOLARIS, \
                      FSTAB_REDHAT, FSTAB_UBUNTU, FSTAB_SOLARIS
 import glob
+
+from infi.mountoolinux.base import MountEntry
 
 from logging import getLogger
 log = getLogger()
@@ -16,9 +17,11 @@ DISTRO_LIST = ["ubuntu", "redhat", "solaris"]
 
 class ReadMountFilesTestCase(unittest.TestCase):
     def _get_mount_repository_for_os(self, distro):
-        if distro in ["ubuntu", "redhat"]:
-            return  LinuxMountRepositoryMixin
+        if distro in ["redhat", "ubuntu"]:
+            from infi.mountoolinux.linux.mount import LinuxMountRepositoryMixin
+            return LinuxMountRepositoryMixin
         elif distro == "solaris":
+            from infi.mountoolinux.solaris.mount import SolarisMountRepositoryMixin
             return SolarisMountRepositoryMixin
 
     @contextmanager

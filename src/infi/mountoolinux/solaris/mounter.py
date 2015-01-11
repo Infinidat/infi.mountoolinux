@@ -1,7 +1,8 @@
 from ..base.mounter import MounterMixin, execute_mount
 
 class SolarisMounterMixin(MounterMixin):
-    FSTAB_PATH = "/etc/vfstab"
+    def _get_fstab_path(self):
+        return "/etc/fstab"
 
     def _get_entry_format(self, entry):
         return entry.get_format_solaris()

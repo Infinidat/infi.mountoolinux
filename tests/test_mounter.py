@@ -1,61 +1,88 @@
+from unittest import SkipTest
 from infi import unittest
 from contextlib import nested, contextmanager
-from .. import LinuxMounterMixin, SolarisMounterMixin, MounterMixin
-from ...show_mounts import MountEntry
+from infi.mountoolinux.base import MountEntry
 from mock import patch
+from platform import platform
 
-DISTRO_LIST = ["redhat", "solaris"]
+DISTRO_LIST = ["linux", "solaris"]
 MOUNT_FS_FLAG = {
-    "redhat": "-t",
+    "linux": "-t",
     "solaris": "-F"
 }
 
-class MounterTestCase(unittest.TestCase):
-    def _get_mounter_mixin_for_os(self, distro):
-        if distro in ["ubuntu", "redhat"]:
-            return LinuxMounterMixin
-        elif distro == "solaris":
-            return SolarisMounterMixin
+def _get_mount_entry_for_os(distro):
+    if distro == "linux":
+        from infi.mountoolinux.linux.mount import LinuxMountEntry
+        return LinuxMountEntry
+    elif distro == "solaris":
+        from infi.mountoolinux.solaris.mount import SolarisMountEntry
+        return SolarisMountEntry
 
+def _get_mounter_mixin_for_os(distro):
+    if distro == "linux":
+        from infi.mountoolinux.linux import LinuxMounterMixin
+        return LinuxMounterMixin
+    elif distro == "solaris":
+        from infi.mountoolinux.solaris import SolarisMounterMixin
+        return SolarisMounterMixin
+
+def _get_mount_repository_mixin_for_os(distro):
+    if distro == "linux":
+        from infi.mountoolinux.linux.mount import LinuxMountRepositoryMixin
+        return LinuxMountRepositoryMixin
+    elif distro == "solaris":
+        from infi.mountoolinux.solaris.mount import SolarisMountRepositoryMixin
+        return SolarisMountRepositoryMixin
+
+class MounterTestCase(unittest.TestCase):
     @contextmanager
     def patch_execute(self):
-        from ... import mounter
+        from infi.mountoolinux.base import mounter
         with patch.object(mounter, "execute") as execute:
             yield execute
 
     @unittest.parameters.iterate("distro", DISTRO_LIST)
     def test_mount__without_options(self, distro):
         with self.patch_execute() as execute:
-            entry = MountEntry("foo" , "bar", "baz")
-            self._get_mounter_mixin_for_os(distro)().mount_entry(entry)
+            entry = _get_mount_entry_for_os(distro)("foo" , "bar", "baz")
+            _get_mounter_mixin_for_os(distro)().mount_entry(entry)
         execute.assert_called_once_with("mount", "{} baz foo bar".format(MOUNT_FS_FLAG[distro]).split())
 
     @unittest.parameters.iterate("distro", DISTRO_LIST)
     def test_umount(self, distro):
         with self.patch_execute() as execute:
-            entry = MountEntry("foo" , "bar", "baz")
-            self._get_mounter_mixin_for_os(distro)().umount_entry(entry)
+            entry = _get_mount_entry_for_os(distro)("foo" , "bar", "baz")
+            _get_mounter_mixin_for_os(distro)().umount_entry(entry)
         execute.assert_called_once_with("umount", "bar".split())
 
     @unittest.parameters.iterate("distro", DISTRO_LIST)
     def test_mount__with_options(self, distro):
         with self.patch_execute() as execute:
-            entry = MountEntry("foo" , "bar", "baz", {"rw":True, "relatime":True,
+            entry = _get_mount_entry_for_os(distro)("foo" , "bar", "baz", {"rw":True, "relatime":True,
                                                       "size":"501668k",
                                                       "mode":755})
-            self._get_mounter_mixin_for_os(distro)().mount_entry(entry)
+            _get_mounter_mixin_for_os(distro)().mount_entry(entry)
         execute.assert_called_once_with("mount", "{} baz foo bar -o relatime,rw,mode=755,size=501668k".format(MOUNT_FS_FLAG[distro]).split())
 
 class MaintainingFSTabTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from platform import platform
+        if not platform().lower() in ["solaris", "linux"]:
+            raise SkipTest("This TestCase runs only on Linux and Solaris")
+
     def setUp(self):
         self._fstab = ''
+        self._mount_entry = _get_mount_entry_for_os(platform().lower())
+        self._mounter_mixin = _get_mounter_mixin_for_os(platform().lower())
+        self._mount_repository_mixin = _get_mount_repository_mixin_for_os(platform().lower())
 
     @contextmanager
     def patch_fstab(self):
-        from ... import OSMountRepositoryMixin, OSMounterMixin
-        with nested(patch.object(OSMountRepositoryMixin, "_read_fstab"),
-                    patch.object(OSMounterMixin, "_read_fstab"),
-                    patch.object(OSMounterMixin, "_get_fstab_context")) as (mock1, mock2, mock3):
+        with nested(patch.object(self._mount_repository_mixin, "_read_fstab"),
+                    patch.object(self._mounter_mixin, "_read_fstab"),
+                    patch.object(self._mounter_mixin, "_get_fstab_context")) as (mock1, mock2, mock3):
             def read_side_effect(*args, **kwargs):
                 return self._fstab
 
@@ -77,17 +104,15 @@ class MaintainingFSTabTestCase(unittest.TestCase):
             yield
 
     def test_add_entry_to_fstab(self):
-        from ... import OSMountRepositoryMixin, OSMounterMixin
         with self.patch_fstab():
-            entry = MountEntry("foo" , "bar", "baz", {"rw":True, "relatime":True,
+            entry = self._mount_entry("foo" , "bar", "baz", {"rw":True, "relatime":True,
                                                       "size":"501668k",
                                                       "mode":755})
-            self.assertFalse(OSMountRepositoryMixin().is_entry_in_fstab(entry))
-            OSMounterMixin().add_entry_to_fstab(entry)
-            self.assertTrue(OSMountRepositoryMixin().is_entry_in_fstab(entry))
+            self.assertFalse(self._mount_repository_mixin().is_entry_in_fstab(entry))
+            self._mounter_mixin().add_entry_to_fstab(entry)
+            self.assertTrue(self._mount_repository_mixin().is_entry_in_fstab(entry))
 
     def test_remove_entry_from_fstab(self):
-        from ... import OSMountRepositoryMixin, OSMounterMixin
         with self.patch_fstab():
             entry = MountEntry("foo" , "bar", "baz", {"rw":True, "relatime":True,
                                                       "size":"501668k",
@@ -95,9 +120,9 @@ class MaintainingFSTabTestCase(unittest.TestCase):
             second_entry = MountEntry("foo1" , "bar1", "baz1", {"rw":True, "relatime":True,
                                                       "size":"501668k",
                                                       "mode":755})
-            OSMounterMixin().add_entry_to_fstab(entry)
-            OSMounterMixin().add_entry_to_fstab(second_entry)
-            self.assertTrue(OSMountRepositoryMixin().is_entry_in_fstab(entry))
-            OSMounterMixin().remove_entry_from_fstab(entry)
-            self.assertFalse(OSMountRepositoryMixin().is_entry_in_fstab(entry))
-            self.assertTrue(OSMountRepositoryMixin().is_entry_in_fstab(second_entry))
+            self._mounter_mixin().add_entry_to_fstab(entry)
+            self._mounter_mixin().add_entry_to_fstab(second_entry)
+            self.assertTrue(self._mount_repository_mixin().is_entry_in_fstab(entry))
+            self._mounter_mixin().remove_entry_from_fstab(entry)
+            self.assertFalse(self._mount_repository_mixin().is_entry_in_fstab(entry))
+            self.assertTrue(self._mount_repository_mixin().is_entry_in_fstab(second_entry))

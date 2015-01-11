@@ -1,7 +1,6 @@
 import platform
 import re
 from munch import Munch
-from . import MountEntry
 from ...base.mount import MountRepositoryMixin
 
 from logging import getLogger
